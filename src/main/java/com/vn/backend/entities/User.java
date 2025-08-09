@@ -1,6 +1,5 @@
 package com.vn.backend.entities;
 
-import com.vn.backend.enums.Role;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -9,6 +8,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
+
+import com.vn.backend.utils.enums.Role;
 
 @Entity
 @Table(name = "users")

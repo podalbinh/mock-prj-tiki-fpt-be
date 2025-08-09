@@ -5,10 +5,12 @@ import com.vn.backend.dto.request.LoginRequest;
 import com.vn.backend.dto.request.SignUpRequest;
 import com.vn.backend.dto.response.JwtResponse;
 import com.vn.backend.dto.response.MessageResponse;
+import com.vn.backend.dto.response.UserResponse;
 import com.vn.backend.entities.User;
-import com.vn.backend.enums.Role;
 import com.vn.backend.exceptions.InvalidDataException;
 import com.vn.backend.repositories.UserRepository;
+import com.vn.backend.utils.enums.Role;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,6 +64,24 @@ public class AuthService implements UserDetailsService{
         if (authentication == null || !authentication.isAuthenticated()) return null;
         String emails = authentication.getName();
         return userRepository.findByEmail(emails).orElse(null);
+    }
+
+    // Lấy thông tin User hiện tại dưới dạng UserResponse
+    public UserResponse getCurrentUserInfo() {
+        User currentUser = getCurrentUser();
+        if (currentUser == null) {
+            throw new InvalidDataException("Không thể lấy thông tin người dùng hiện tại");
+        }
+        return UserResponse.builder()
+                .id(currentUser.getId())
+                .email(currentUser.getEmail())
+                .fullName(currentUser.getFullName())
+                .phone(currentUser.getPhone())
+                .isActive(currentUser.getIsActive())
+                .role(currentUser.getRole())
+                .createdAt(currentUser.getCreatedAt())
+                .updatedAt(currentUser.getUpdatedAt())
+                .build();
     }
 
 
