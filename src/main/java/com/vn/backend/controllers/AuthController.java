@@ -6,14 +6,14 @@ import com.vn.backend.dto.request.SignUpRequest;
 import com.vn.backend.dto.response.JwtResponse;
 import com.vn.backend.dto.response.MessageResponse;
 import com.vn.backend.dto.response.ResponseData;
+import com.vn.backend.dto.response.UserResponse;
 import com.vn.backend.services.AuthService;
-import com.vn.backend.services.RoleService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 
-@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -33,8 +32,6 @@ public class AuthController {
     private JwtTokenPovider tokenPovider;
     @Autowired
     private AuthService authService;
-    @Autowired
-    private RoleService roleService;
     @Autowired
     private PasswordEncoder encoder;
 
@@ -51,6 +48,14 @@ public class AuthController {
         logger.info("[IN] POST /api/auth/login");
         var response = ResponseData.success(authService.login(loginRequest));
         logger.info("[OUT] POST /api/auth/login");
+        return response;
+    }
+
+    @GetMapping("/me")
+    public ResponseData<UserResponse> getCurrentUser() {
+        logger.info("[IN] GET /api/auth/me");
+        var response = ResponseData.success(authService.getCurrentUserInfo());
+        logger.info("[OUT] GET /api/auth/me");
         return response;
     }
 }

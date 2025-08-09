@@ -5,17 +5,15 @@ import com.vn.backend.dto.request.LoginRequest;
 import com.vn.backend.dto.request.SignUpRequest;
 import com.vn.backend.dto.response.JwtResponse;
 import com.vn.backend.dto.response.MessageResponse;
-import com.vn.backend.entities.Role;
+import com.vn.backend.dto.response.UserResponse;
 import com.vn.backend.entities.User;
 import com.vn.backend.exceptions.InvalidDataException;
-import com.vn.backend.exceptions.NotFoundException;
-import com.vn.backend.repositories.RoleRepository;
 import com.vn.backend.repositories.UserRepository;
-import com.vn.backend.utils.enums.ERole;
+import com.vn.backend.utils.enums.Role;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -23,13 +21,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -46,9 +40,6 @@ public class AuthService implements UserDetailsService{
 
     @Autowired
     private PasswordEncoder encoder;
-
-    @Autowired
-    private RoleRepository roleRepository;
 
     @Autowired
     private AuthenticationManager authenticationManager;
@@ -75,6 +66,24 @@ public class AuthService implements UserDetailsService{
         return userRepository.findByEmail(emails).orElse(null);
     }
 
+    // Lấy thông tin User hiện tại dưới dạng UserResponse
+    public UserResponse getCurrentUserInfo() {
+        User currentUser = getCurrentUser();
+        if (currentUser == null) {
+            throw new InvalidDataException("Không thể lấy thông tin người dùng hiện tại");
+        }
+        return UserResponse.builder()
+                .id(currentUser.getId())
+                .email(currentUser.getEmail())
+                .fullName(currentUser.getFullName())
+                .phone(currentUser.getPhone())
+                .isActive(currentUser.getIsActive())
+                .role(currentUser.getRole())
+                .createdAt(currentUser.getCreatedAt())
+                .updatedAt(currentUser.getUpdatedAt())
+                .build();
+    }
+
 
     public MessageResponse registerUser(SignUpRequest signUpRequest){
         logger.info("[IN] Register User {}", signUpRequest.getEmail());
@@ -87,14 +96,9 @@ public class AuthService implements UserDetailsService{
             User user = new User();
             user.setPassword(encoder.encode(signUpRequest.getPassword()));
             user.setEmail(signUpRequest.getEmail());
-
             user.setIsActive(true);
-            // User quyen mac dinh
-            Role userRoles = roleRepository.findByRolename(ERole.ROLE_USER)
-                        .orElseThrow(() -> new RuntimeException("Role is not found"));
-            Set<Role> roles = new HashSet<>();
-            roles.add(userRoles);
-            user.setListRoles(roles);
+            // Set role mặc định là USER
+            user.setRole(Role.USER);
         userRepository.save(user);
         logger.info("[OUT] Register User {}", signUpRequest.getEmail());
         return new MessageResponse("Đăng ký thành công");
