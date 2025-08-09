@@ -38,7 +38,6 @@ public class Product {
     private Boolean isActive;
 
 
-    @Lob // Large Object
-    @Column(name = "thumbnail_url", columnDefinition = "LONGBLOB")
-    private byte[] thumbnailUrl;    // lob lưu ảnh
+    @Column(name = "thumbnail_url")
+    private String thumbnailUrl;    //  ảnh
 }

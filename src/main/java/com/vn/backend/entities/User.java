@@ -37,9 +37,8 @@ public class User {
     @Column(length = 20)
     private String phone;
 
-    @Lob // Large Object
-    @Column(name = "avatar", columnDefinition = "LONGBLOB")
-    private byte[] avatar;    // lob lưu ảnh
+    @Column(name = "avatarUrl")
+    private String avatarUrl;    //  ảnh
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;

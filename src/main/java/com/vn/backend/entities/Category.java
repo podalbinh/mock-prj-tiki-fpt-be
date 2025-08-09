@@ -25,7 +25,6 @@ public class Category {
     private Category parent;
 
 
-    @Lob // Large Object
-    @Column(name = "thumbnail_url", columnDefinition = "LONGBLOB")
-    private byte[] thumbnailUrl;    // lob lưu ảnh
+    @Column(name = "thumbnail_url")
+    private String thumbnailUrl;    //  ảnh
 }

@@ -54,8 +54,8 @@ public class WebSecurityConfig {
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
                                         "/common/**",
-                                        "api/auth/**",
-                                        "api/**"
+                                        "/api/auth/**",  // sửa để không phải auth
+                                        "/api/**"    // sửa để không phải auth
                                 )
                                 .permitAll()
                                 .anyRequest().authenticated()

@@ -21,9 +21,8 @@ public class ProductImage {
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
-    @Lob // Large Object
-    @Column(name = "data", columnDefinition = "LONGBLOB")
-    private byte[] data;    // lob lưu ảnh
+    @Column(name = "url")
+    private String url;    // ảnh
 
     @Column(name = "alt_text", length = 255)
     private String altText;
