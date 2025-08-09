@@ -1,4 +1,4 @@
-package com.vn.backend.enums;
+package com.vn.backend.utils.enums;
 
 public enum Role {
     USER,
