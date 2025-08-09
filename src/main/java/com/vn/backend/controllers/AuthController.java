@@ -7,7 +7,6 @@ import com.vn.backend.dto.response.JwtResponse;
 import com.vn.backend.dto.response.MessageResponse;
 import com.vn.backend.dto.response.ResponseData;
 import com.vn.backend.services.AuthService;
-import com.vn.backend.services.RoleService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,8 +32,6 @@ public class AuthController {
     private JwtTokenPovider tokenPovider;
     @Autowired
     private AuthService authService;
-    @Autowired
-    private RoleService roleService;
     @Autowired
     private PasswordEncoder encoder;
 

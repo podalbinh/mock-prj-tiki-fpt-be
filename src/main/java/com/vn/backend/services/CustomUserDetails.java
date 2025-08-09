@@ -2,7 +2,6 @@ package com.vn.backend.services;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import com.vn.backend.entities.User;
 import org.springframework.security.core.GrantedAuthority;
@@ -34,9 +33,9 @@ public class CustomUserDetails implements UserDetails {
 
 
     public static CustomUserDetails mapUserToUserDetails(User user){
-        List<GrantedAuthority> listAuthorities=user.getListRoles().stream()
-                .map(roles->new SimpleGrantedAuthority(roles.getRolename().name()))
-                .collect(Collectors.toList());
+        List<GrantedAuthority> listAuthorities = List.of(
+                new SimpleGrantedAuthority(user.getRole().name().toLowerCase())
+        );
         return new CustomUserDetails(
                 user.getId(),
                 user.getEmail(),

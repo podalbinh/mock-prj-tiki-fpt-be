@@ -1,5 +1,6 @@
 package com.vn.backend.entities;
 
+import com.vn.backend.enums.Role;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -8,8 +9,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
 
 @Entity
 @Table(name = "users")
@@ -50,10 +49,10 @@ public class User {
     @Column(name = "is_active",nullable = false)
     private Boolean isActive;
 
-
-    @ManyToMany(fetch = FetchType.EAGER,cascade = CascadeType.DETACH)
-    @JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
-    private Set<Role> listRoles = new HashSet<>();
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role", nullable = false)
+    @Builder.Default
+    private Role role = Role.USER;
 
     @PrePersist
     public void prePersist() {
