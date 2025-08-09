@@ -1,7 +1,7 @@
 <configuration>
 
     <property name="LOG_DIR" value="logs"/>
-    <property name="APP_NAME" value="tam"/>
+    <property name="APP_NAME" value="mock-prj"/>
 
     <!-- Console Appender -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
