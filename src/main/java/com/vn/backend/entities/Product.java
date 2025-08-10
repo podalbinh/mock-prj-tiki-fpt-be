@@ -37,6 +37,9 @@ public class Product {
     @Column(name = "is_active", nullable = false)
     private Boolean isActive;
 
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private Category category;
 
     @Column(name = "thumbnail_url")
     private String thumbnailUrl;    //  ảnh
