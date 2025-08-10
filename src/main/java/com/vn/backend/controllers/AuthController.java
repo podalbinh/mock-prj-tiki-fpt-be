@@ -35,7 +35,7 @@ public class AuthController {
     @Autowired
     private PasswordEncoder encoder;
 
-    @PostMapping("/signup")
+    @PostMapping("/register")
     public ResponseData<MessageResponse> registerUser(@RequestBody SignUpRequest signUpRequest) {
         logger.info("[IN] POST /api/auth/signup");
         var response = ResponseData.created(authService.registerUser(signUpRequest));

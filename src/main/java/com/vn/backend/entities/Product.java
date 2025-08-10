@@ -40,4 +40,8 @@ public class Product {
 
     @Column(name = "thumbnail_url")
     private String thumbnailUrl;    //  ảnh
+
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private Category category;
 }
