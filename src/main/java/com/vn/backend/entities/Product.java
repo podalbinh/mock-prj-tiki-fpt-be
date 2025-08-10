@@ -40,4 +40,7 @@ public class Product {
 
     @Column(name = "thumbnail_url")
     private String thumbnailUrl;    //  ảnh
+
+    @Column(name = "category_id")
+    private String categoryId; 
 }
