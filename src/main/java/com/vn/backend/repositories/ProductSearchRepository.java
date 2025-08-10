@@ -19,6 +19,7 @@ public interface ProductSearchRepository extends JpaRepository<Product, Long> {
         LEFT JOIN reviews r ON p.id = r.product_id
         LEFT JOIN order_items oi ON p.id = oi.product_id
         WHERE p.is_active = true
+        AND (:categoryId IS NULL OR p.category_id = :categoryId)
         GROUP BY p.id, p.name, p.price, p.thumbnail_url
         HAVING COALESCE(AVG(r.rating), 0) >= COALESCE(:minRating, 0)
         ORDER BY p.price ASC
@@ -28,12 +29,14 @@ public interface ProductSearchRepository extends JpaRepository<Product, Long> {
         FROM products p
         LEFT JOIN reviews r ON p.id = r.product_id
         WHERE p.is_active = true
+        AND (:categoryId IS NULL OR p.category_id = :categoryId)
         GROUP BY p.id
         HAVING COALESCE(AVG(r.rating), 0) >= COALESCE(:minRating, 0)
         """,
         nativeQuery = true)
     Page<Object[]> findProductsWithRatingAndSold(
         @Param("minRating") Double minRating,
+        @Param("categoryId") Long categoryId,
         Pageable pageable
     );
     
@@ -45,6 +48,7 @@ public interface ProductSearchRepository extends JpaRepository<Product, Long> {
         LEFT JOIN reviews r ON p.id = r.product_id
         LEFT JOIN order_items oi ON p.id = oi.product_id
         WHERE p.is_active = true
+        AND (:categoryId IS NULL OR p.category_id = :categoryId)
         GROUP BY p.id, p.name, p.price, p.thumbnail_url
         HAVING COALESCE(AVG(r.rating), 0) >= COALESCE(:minRating, 0)
         ORDER BY p.price DESC
@@ -54,12 +58,14 @@ public interface ProductSearchRepository extends JpaRepository<Product, Long> {
         FROM products p
         LEFT JOIN reviews r ON p.id = r.product_id
         WHERE p.is_active = true
+        AND (:categoryId IS NULL OR p.category_id = :categoryId)
         GROUP BY p.id
         HAVING COALESCE(AVG(r.rating), 0) >= COALESCE(:minRating, 0)
         """,
         nativeQuery = true)
     Page<Object[]> findProductsByPopularity(
         @Param("minRating") Double minRating,
+        @Param("categoryId") Long categoryId,
         Pageable pageable
     );
 
@@ -71,6 +77,7 @@ public interface ProductSearchRepository extends JpaRepository<Product, Long> {
         LEFT JOIN reviews r ON p.id = r.product_id
         LEFT JOIN order_items oi ON p.id = oi.product_id
         WHERE p.is_active = true
+        AND (:categoryId IS NULL OR p.category_id = :categoryId)
         GROUP BY p.id, p.name, p.price, p.thumbnail_url
         HAVING COALESCE(AVG(r.rating), 0) >= COALESCE(:minRating, 0)
         ORDER BY COALESCE(SUM(oi.quantity), 0) DESC
@@ -80,12 +87,14 @@ public interface ProductSearchRepository extends JpaRepository<Product, Long> {
         FROM products p
         LEFT JOIN reviews r ON p.id = r.product_id
         WHERE p.is_active = true
+        AND (:categoryId IS NULL OR p.category_id = :categoryId)
         GROUP BY p.id
         HAVING COALESCE(AVG(r.rating), 0) >= COALESCE(:minRating, 0)
         """,
         nativeQuery = true)
     Page<Object[]> findProductsByPopularityOnly(
         @Param("minRating") Double minRating,
+        @Param("categoryId") Long categoryId,
         Pageable pageable
     );
 

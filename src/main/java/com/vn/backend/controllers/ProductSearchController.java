@@ -30,7 +30,7 @@ public class ProductSearchController {
     @GetMapping("/search")
     @Operation(
         summary = "Search products with pagination and sorting", 
-        description = "Search products with various sorting options and filtering by rating. " +
+        description = "Search products with various sorting options and filtering by rating and category. " +
                     "Returns paginated results with product information including ratings, sales data, and mock flags."
     )
     @Parameters({
@@ -70,7 +70,15 @@ public class ProductSearchController {
                 defaultValue = "4.0"
             )
         ),
-
+        @Parameter(
+            name = "category_id", 
+            description = "Category ID to filter products. If not provided, all categories will be included.", 
+            example = "1",
+            schema = @io.swagger.v3.oas.annotations.media.Schema(
+                type = "integer", 
+                minimum = "1"
+            )
+        )
     })
     @ApiResponses({
         @ApiResponse(
@@ -94,11 +102,12 @@ public class ProductSearchController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "popular") String sortBy,
-            @RequestParam(defaultValue = "4.0") double minRating) {
+            @RequestParam(defaultValue = "4.0") double minRating,
+            @RequestParam(required = false) Long categoryId) {
   
         
-        logger.info("[IN] Search products - Page: {}, Size: {}, SortBy: {}, MinRating: {}", 
-                   page, size, sortBy, minRating);
+        logger.info("[IN] Search products - Page: {}, Size: {}, SortBy: {}, MinRating: {}, CategoryId: {}", 
+                   page, size, sortBy, minRating, categoryId);
         
         // Validate parameters
         if (page < 0) {
@@ -117,79 +126,12 @@ public class ProductSearchController {
         request.setSize(size);
         request.setSortBy(sortBy);
         request.setMinRating(minRating);
+        request.setCategoryId(categoryId);
         
         PageResponse<List<ProductHPResponse>> response = productSearchService.searchProducts(request);
-        logger.info("[OUT] Search products - Page: {}, Size: {}, SortBy: {}, MinRating: {}", 
-        page, size, sortBy, minRating);
+        logger.info("[OUT] Search products - Page: {}, Size: {}, SortBy: {}, MinRating: {}, CategoryId: {}", 
+        page, size, sortBy, minRating, categoryId);
         return ResponseData.success(response);
     }
     
-    @GetMapping("/category/{categoryId}")
-    @Operation(
-        summary = "Get products by category ID with pagination", 
-        description = "Retrieve products from a specific category with pagination support. " +
-                    "Returns products with ratings, sales data, and mock flags."
-    )
-    @Parameters({
-        @Parameter(
-            name = "categoryId", 
-            description = "ID of the category to filter products", 
-            example = "1",
-            required = true,
-            schema = @io.swagger.v3.oas.annotations.media.Schema(type = "integer", minimum = "1")
-        ),
-        @Parameter(
-            name = "page", 
-            description = "Page number (zero-based indexing). Default: 0", 
-            example = "0",
-            schema = @io.swagger.v3.oas.annotations.media.Schema(type = "integer", minimum = "0")
-        ),
-        @Parameter(
-            name = "size", 
-            description = "Number of products per page. Default: 10, Max: 100", 
-            example = "10",
-            schema = @io.swagger.v3.oas.annotations.media.Schema(type = "integer", minimum = "1", maximum = "100")
-        )
-    })
-    @ApiResponses({
-        @ApiResponse(
-            responseCode = "200", 
-            description = "Successfully retrieved products by category",
-            content = @io.swagger.v3.oas.annotations.media.Content(
-                mediaType = "application/json",
-                schema = @io.swagger.v3.oas.annotations.media.Schema(implementation = PageResponse.class)
-            )
-        ),
-        @ApiResponse(
-            responseCode = "400", 
-            description = "Bad request - Invalid parameters"
-        ),
-        @ApiResponse(
-            responseCode = "404", 
-            description = "Category not found"
-        ),
-        @ApiResponse(
-            responseCode = "500", 
-            description = "Internal server error"
-        )
-    })
-    public ResponseData<PageResponse<List<ProductHPResponse>>> getProductsByCategory(
-            @PathVariable Long categoryId,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        
-        logger.info("[IN] Get products by category - CategoryId: {}, Page: {}, Size: {}", categoryId, page, size);
-        
-        // Validate parameters
-        if (page < 0) {
-            page = 0;
-        }
-        if (size < 1 || size > 100) {
-            size = 10;
-        }
-        
-        PageResponse<List<ProductHPResponse>> response = productSearchService.getProductsByCategory(categoryId, page, size);
-        logger.info("[OUT] Get products by category - CategoryId: {}, Total: {}", categoryId, response.getTotalElements());
-         return ResponseData.success(response);
-    }
 }
