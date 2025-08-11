@@ -14,7 +14,6 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class CreateProductRequest {
-    private String sku;
     private String name;
     private String description;
     private String shortDescription;
@@ -31,7 +30,7 @@ public class CreateProductRequest {
     private Boolean isActive;
 
     private List<AuthorResponse> authors;
-    private List<CategoryResponse> categories;
+    private CategoryResponse categories;
     private List<ProductImageResponse> images;
 
 }

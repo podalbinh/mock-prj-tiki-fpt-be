@@ -1,15 +1,12 @@
 package com.vn.backend.controllers;
 
 import com.vn.backend.dto.request.CreateProductRequest;
-import com.vn.backend.dto.response.CategoryResponse;
 import com.vn.backend.dto.response.ProductResponse;
 import com.vn.backend.dto.response.ResponseData;
 import com.vn.backend.services.ProductService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

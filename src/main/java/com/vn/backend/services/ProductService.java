@@ -31,7 +31,6 @@ public class ProductService {
 
     public ProductResponse createProduct(CreateProductRequest request) {
         Product product = Product.builder()
-                .sku(request.getSku())
                 .name(request.getName())
                 .description(request.getDescription())
                 .shortDescription(request.getShortDescription())
@@ -75,7 +74,6 @@ public class ProductService {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
-        product.setSku(request.getSku());
         product.setName(request.getName());
         product.setDescription(request.getDescription());
         product.setShortDescription(request.getShortDescription());
@@ -106,7 +104,6 @@ public class ProductService {
     private ProductResponse mapToResponse(Product product) {
         return ProductResponse.builder()
                 .id(product.getId())
-                .sku(product.getSku())
                 .name(product.getName())
                 .description(product.getDescription())
                 .shortDescription(product.getShortDescription())
@@ -125,9 +122,11 @@ public class ProductService {
                 .authors(product.getAuthors().stream()
                         .map(a -> new AuthorResponse(a.getId(), a.getName(), a.getSlug()))
                         .collect(Collectors.toList()))
-                .categories(product.getCategories().stream()
-                        .map(c -> new CategoryResponse(c.getId(), c.getName()))
-                        .collect(Collectors.toList()))
+                .categories(
+                        product.getCategory() != null
+                                ? new CategoryResponse(product.getCategory().getId(), product.getCategory().getName())
+                                : null
+                )
                 .images(product.getImages().stream()
                         .map(i -> new ProductImageResponse(
                                 i.getId(),

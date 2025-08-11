@@ -29,6 +29,6 @@ public class ProductResponse {
     private Boolean isActive;
 
     private List<AuthorResponse> authors;
-    private List<CategoryResponse> categories;
+    private CategoryResponse categories;
     private List<ProductImageResponse> images;
 }

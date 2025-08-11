@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -19,9 +20,6 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
-
-    @Column(nullable = false, unique = true, length = 50)
-    private String sku;
 
     @Column(nullable = false, length = 255)
     private String name;
@@ -66,15 +64,12 @@ public class Product {
     private Boolean isActive;
 
     @OneToMany(mappedBy = "product", fetch = FetchType.EAGER)
-    private List<Author> authors;
+    private List<Author> authors = new ArrayList<>();
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "product_categories",
-            joinColumns = @JoinColumn(name = "product_id"),
-            inverseJoinColumns = @JoinColumn(name = "category_id")
-    )
-    private List<Category> categories;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "category_id")
+    private Category category;
+
 
     @OneToMany(mappedBy = "product", fetch = FetchType.EAGER)
     private List<ProductImage> images;
