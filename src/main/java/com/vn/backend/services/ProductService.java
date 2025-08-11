@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -51,15 +52,18 @@ public class ProductService {
         return mapToResponse(saved);
     }
 
-    public Page<ProductResponse> getAllProducts(Pageable pageable, String sortBy, String direction) {
-        Sort sort = direction.equalsIgnoreCase("desc") ?
-                Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+    public List<ProductResponse> getAllProducts(Sort sort, Integer limit) {
+        List<Product> entities = productRepository.findAll(sort);
 
-        Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
-
-        return productRepository.findAll(sortedPageable)
-                .map(this::mapToResponse);
+        Stream<Product> stream = entities.stream();
+        if (limit != null && limit > 0) {
+            stream = stream.limit(limit);
+        }
+        return stream
+                .map(this::mapToResponse)
+                .toList();
     }
+
 
     public ProductResponse getProductById(Long id) {
         return productRepository.findById(id)
