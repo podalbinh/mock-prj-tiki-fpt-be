@@ -15,4 +15,5 @@ public class CreateUserRequest {
     private String phone;
     private Role role;
     private Boolean isActive;
+    private String avatarUrl;
 }

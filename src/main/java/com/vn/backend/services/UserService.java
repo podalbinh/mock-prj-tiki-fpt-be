@@ -65,6 +65,7 @@ public class UserService {
                 .phone(request.getPhone())
                 .role(request.getRole() != null ? request.getRole() : com.vn.backend.utils.enums.Role.USER)
                 .isActive(request.getIsActive() != null ? request.getIsActive() : true)
+                .avatarUrl(request.getAvatarUrl())
                 .build();
 
         User savedUser = userRepository.save(user);
@@ -94,6 +95,10 @@ public class UserService {
             user.setIsActive(request.getIsActive());
         }
 
+        if (request.getAvatarUrl() != null) {
+            user.setAvatarUrl(request.getAvatarUrl());
+        }
+
         User updatedUser = userRepository.save(user);
         UserResponse response = convertToUserResponse(updatedUser);
         logger.info("[OUT] Update user with ID: {}", id);
@@ -120,6 +125,7 @@ public class UserService {
                 .phone(user.getPhone())
                 .isActive(user.getIsActive())
                 .role(user.getRole())
+                .avatarUrl(user.getAvatarUrl())
                 .createdAt(user.getCreatedAt())
                 .updatedAt(user.getUpdatedAt())
                 .build();
