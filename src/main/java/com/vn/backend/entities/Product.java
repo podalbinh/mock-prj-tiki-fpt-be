@@ -36,34 +36,37 @@ public class Product {
     @Column(name="original_price", nullable = false, precision = 10, scale = 2)
     private BigDecimal originalPrice;
 
-    @Column(name = "quantity_sold")
+    @Column(name = "quantity_sold", columnDefinition = "INT DEFAULT 0")
     private Integer quantitySold;
 
     @Column(name = "rating_average")
     private Float ratingAverage;
 
-    @Column(name="publisher_vn", nullable = false, length = 255)
+    @Column(name="publisher_vn", length = 255)
     private String publisherVn;
 
-    @Column(name="publication_date", nullable = false, length = 255)
+    @Column(name="publication_date", length = 255)
     private String publicationDate;
 
-    @Column(name="dimensions", nullable = false, length = 255)
+    @Column(name="dimensions", length = 255)
     private String dimensions;
 
-    @Column(name="book_cover", nullable = false, length = 255)
+    @Column(name="book_cover", length = 255)
     private String bookCover;
 
-    @Column(name="number_of_page", nullable = false, length = 255)
+    @Column(name="number_of_page", length = 255)
     private String numberOfPage;
 
-    @Column(name = "stock_quantity", nullable = false)
+    @Column(name = "stock_quantity", columnDefinition = "INT DEFAULT 0")
     private Integer stockQuantity;
 
     @Column(name = "is_active", nullable = false)
     private Boolean isActive;
 
-    @OneToMany(mappedBy = "product", fetch = FetchType.EAGER)
+    @Column(name = "thumbnail", nullable = false)
+    private String thumbnail;
+
+    @OneToMany(mappedBy = "product", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Author> authors = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.EAGER)
@@ -71,6 +74,6 @@ public class Product {
     private Category category;
 
 
-    @OneToMany(mappedBy = "product", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "product", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductImage> images;
 }

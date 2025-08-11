@@ -4,6 +4,8 @@ import com.vn.backend.dto.request.CreateProductRequest;
 import com.vn.backend.dto.response.ProductResponse;
 import com.vn.backend.dto.response.ResponseData;
 import com.vn.backend.services.ProductService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -14,12 +16,15 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/products")
 public class ProductController {
+    private static final Logger logger = LoggerFactory.getLogger(ProductController.class);
+
 
     @Autowired
     private ProductService productService;
 
     @PostMapping
     public ResponseData<ProductResponse> createProduct(@RequestBody CreateProductRequest request) {
+        logger.info("[IN] GET /api/products" );
         var response = ResponseData.created(productService.createProduct(request));
         return response;
     }

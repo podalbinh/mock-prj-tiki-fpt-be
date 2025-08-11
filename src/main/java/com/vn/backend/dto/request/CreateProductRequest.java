@@ -1,8 +1,5 @@
 package com.vn.backend.dto.request;
 
-import com.vn.backend.dto.response.AuthorResponse;
-import com.vn.backend.dto.response.CategoryResponse;
-import com.vn.backend.dto.response.ProductImageResponse;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -19,18 +16,15 @@ public class CreateProductRequest {
     private String shortDescription;
     private BigDecimal listPrice;
     private BigDecimal originalPrice;
-    private Integer quantitySold;
-    private Float ratingAverage;
     private String publisherVn;
     private String publicationDate;
     private String dimensions;
     private String bookCover;
     private String numberOfPage;
-    private Integer stockQuantity;
-    private Boolean isActive;
+    private String thumbnail;
 
-    private List<AuthorResponse> authors;
-    private CategoryResponse categories;
-    private List<ProductImageResponse> images;
+    private List<CreateAuthorRequest> authors;
+    private Long categoriesId;
+    private List<CreateProductImageRequest> images;
 
 }

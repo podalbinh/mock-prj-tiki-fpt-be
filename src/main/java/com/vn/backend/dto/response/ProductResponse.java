@@ -12,7 +12,6 @@ import java.util.List;
 @Builder
 public class ProductResponse {
     private Long id;
-    private String sku;
     private String name;
     private String description;
     private String shortDescription;
@@ -27,8 +26,9 @@ public class ProductResponse {
     private String numberOfPage;
     private Integer stockQuantity;
     private Boolean isActive;
+    private String thumbnail;
 
     private List<AuthorResponse> authors;
-    private CategoryResponse categories;
+    private Long categoriesId;
     private List<ProductImageResponse> images;
 }

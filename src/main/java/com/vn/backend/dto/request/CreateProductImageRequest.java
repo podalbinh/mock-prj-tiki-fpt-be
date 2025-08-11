@@ -20,5 +20,4 @@ public class CreateProductImageRequest {
     private String smallUrl;
     private String thumbnailUrl;
     private String altText;
-    private Long productId; // id của product liên kết
 }
