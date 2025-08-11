@@ -12,5 +12,6 @@ public class UpdateUserRequest {
     private String fullName;
     private String phone;
     private Role role;
+    private String avatarUrl;
     private Boolean isActive;
 }

@@ -19,6 +19,7 @@ public class UserResponse {
     private String phone;
     private Boolean isActive;
     private Role role;
+    private String avatarUrl;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }
