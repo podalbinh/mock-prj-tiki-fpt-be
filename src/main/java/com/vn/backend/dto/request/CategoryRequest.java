@@ -1,16 +1,13 @@
-package com.vn.backend.dto.response;
+package com.vn.backend.dto.request;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-@Getter
-@Setter
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class CategoryResponse {
-    Long id;
+public class CategoryRequest {
     String name;
 }

@@ -26,6 +26,9 @@ public class Category {
     @JoinColumn(name = "parent_id")
     private Category parent;
 
+    @Column(name = "thumbnail_url")
+    private String thumbnailUrl;    //  ảnh
+
     @ManyToMany(mappedBy = "categories")
     private List<Product> products;
 }
