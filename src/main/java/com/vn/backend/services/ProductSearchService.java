@@ -5,6 +5,7 @@ import com.vn.backend.dto.response.PageResponse;
 import com.vn.backend.dto.response.ProductHPResponse;
 import com.vn.backend.repositories.ProductSearchRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -17,6 +18,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ProductSearchService {
 
+    @Autowired
     private final ProductSearchRepository productSearchRepository;
 
     public PageResponse<List<ProductHPResponse>> searchProducts(ProductSearchRequest request) {
@@ -78,9 +80,9 @@ public class ProductSearchService {
         ProductHPResponse product = new ProductHPResponse(
                 ((Number) row[0]).longValue(), // id
                 (String) row[1], // name -> title
-                null, // author - sẽ được set bởi mockData()
+                (String)row[6], // author
                 ((Number) row[2]).doubleValue(), // price
-                null, // originalPrice - sẽ được set bởi mockData()
+                ((Number) row[7]).doubleValue(), // originalPrice
                 null, // discount - sẽ được set bởi mockData()
                 ((Number) row[4]).doubleValue(), // rating
                 ((Number) row[5]).intValue(), // sold

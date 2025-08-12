@@ -3,6 +3,9 @@ package com.vn.backend.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "categories")
 @Getter
@@ -25,5 +28,9 @@ public class Category {
     private Category parent;
 
     @Column(name = "thumbnail_url")
-    private String thumbnailUrl;    //  ảnh
+    private String thumbnailUrl;
+
+    @OneToMany(mappedBy = "category")
+    private List<Product> products = new ArrayList<>();
+
 }
