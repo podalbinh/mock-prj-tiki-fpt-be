@@ -37,7 +37,6 @@ public class Product {
     @Column(name = "is_active", nullable = false)
     private Boolean isActive;
 
-
     @Column(name = "thumbnail_url")
     private String thumbnailUrl;    //  ảnh
 
