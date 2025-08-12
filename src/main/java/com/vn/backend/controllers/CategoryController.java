@@ -28,9 +28,9 @@ public class CategoryController {
      * Get root categories with their subcategories for sidebar display
      * @return List of categories with hierarchical structure
      */
-    @GetMapping
+    @GetMapping("/with-subcategories")
     public ResponseData<List<CategoryResponse>> getCategoriesWithSubcategories() {
-        logger.info("[IN] GET /api/categories");
+        logger.info("[IN] GET /api/categories/with-subcategories");
         List<CategoryResponse> categories = categoryService.getCategoriesWithSubcategories();
         logger.info("[OUT] GET /api/categories - Success, found {} root categories with subcategories", categories.size());
         return ResponseData.success(categories);

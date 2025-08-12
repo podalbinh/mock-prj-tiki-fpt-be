@@ -10,4 +10,6 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CategoryRequest {
     String name;
+    String thumbnailUrl;
+    Long parentId; // ID của category cha
 }
