@@ -21,10 +21,11 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.awt.*;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.lang.Long;
+import java.lang.Double;
 
 @Service
 @RequiredArgsConstructor
@@ -101,6 +102,19 @@ public class ProductService {
     }
 
     public List<ProductResponse> getAllProducts(Sort sort, Integer limit) {
+        // Kiểm tra nếu sort theo quantitySold hoặc ratingAverage
+        if (sort != null && sort.iterator().hasNext()) {
+            Sort.Order firstOrder = sort.iterator().next();
+            String property = firstOrder.getProperty();
+            
+            if ("quantitySold".equals(property)) {
+                return getAllProductsSortedByQuantitySold(firstOrder.getDirection(), limit);
+            } else if ("ratingAverage".equals(property)) {
+                return getAllProductsSortedByRating(firstOrder.getDirection(), limit);
+            }
+        }
+        
+        // Sort thông thường cho các trường khác
         List<Product> entities = productRepository.findAll(sort);
 
         Stream<Product> stream = entities.stream();
@@ -110,6 +124,144 @@ public class ProductService {
         return stream
                 .map(this::mapToResponse)
                 .toList();
+    }
+
+    private List<ProductResponse> getAllProductsSortedByQuantitySold(Sort.Direction direction, Integer limit) {
+        List<Object[]> results;
+        if (Sort.Direction.DESC.equals(direction)) {
+            results = productRepository.findAllProductsOrderByQuantitySoldDesc();
+        } else {
+            results = productRepository.findAllProductsOrderByQuantitySoldAsc();
+        }
+        
+        Stream<ProductResponse> stream = results.stream()
+                .map(result -> {
+                    Product product = (Product) result[0];
+                    Long quantitySold = (Long) result[1];
+                    return mapToResponseWithQuantitySold(product, quantitySold);
+                });
+                
+        if (limit != null && limit > 0) {
+            stream = stream.limit(limit);
+        }
+        
+        return stream.toList();
+    }
+
+    private List<ProductResponse> getAllProductsSortedByRating(Sort.Direction direction, Integer limit) {
+        List<Object[]> results;
+        if (Sort.Direction.DESC.equals(direction)) {
+            results = productRepository.findAllProductsOrderByRatingDesc();
+        } else {
+            results = productRepository.findAllProductsOrderByRatingAsc();
+        }
+        
+        Stream<ProductResponse> stream = results.stream()
+                .map(result -> {
+                    Product product = (Product) result[0];
+                    Double ratingAverage = (Double) result[1];
+                    return mapToResponseWithRating(product, ratingAverage);
+                });
+                
+        if (limit != null && limit > 0) {
+            stream = stream.limit(limit);
+        }
+        
+        return stream.toList();
+    }
+
+    private ProductResponse mapToResponseWithQuantitySold(Product product, Long quantitySold) {
+        Double ratingAverage = productRepository.getRatingAverage(product.getId());
+        if (ratingAverage != null) {
+            ratingAverage = Math.round(ratingAverage * 10.0) / 10.0;
+        }
+        
+        return ProductResponse.builder()
+                .id(product.getId())
+                .name(product.getName())
+                .description(product.getDescription())
+                .shortDescription(product.getShortDescription())
+                .listPrice(product.getPrice())
+                .originalPrice(product.getOriginalPrice())
+                .quantitySold(quantitySold != null ? quantitySold.intValue() : 0)
+                .ratingAverage(ratingAverage != null ? ratingAverage.floatValue() : 0.0f)
+                .publisherVn(product.getPublisherVn())
+                .publicationDate(product.getPublicationDate())
+                .dimensions(product.getDimensions())
+                .bookCover(product.getBookCover())
+                .numberOfPage(product.getNumberOfPage())
+                .stockQuantity(product.getStockQuantity())
+                .isActive(product.getIsActive())
+                .authors(product.getAuthors().stream()
+                        .map(a -> new AuthorResponse(a.getId(), a.getName(), a.getSlug()))
+                        .collect(Collectors.toList()))
+                .categoriesId(
+                        product.getCategory() != null
+                                ? product.getCategory().getId()
+                                : null
+                )
+                .images(product.getImages().stream()
+                        .map(i -> new ProductImageResponse(
+                                i.getId(),
+                                i.getBaseUrl(),
+                                i.getLabel(),
+                                i.getLargeUrl(),
+                                i.getMediumUrl(),
+                                i.getSmallUrl(),
+                                i.getThumbnailUrl(),
+                                i.getAltText()
+                        ))
+                        .collect(Collectors.toList()))
+                .build();
+    }
+
+    private ProductResponse mapToResponseWithRating(Product product, Double ratingAverage) {
+        Long quantitySold = productRepository.getSoldQuantity(product.getId());
+        if (quantitySold == null) {
+            quantitySold = 0L;
+        }
+        
+        if (ratingAverage != null) {
+            ratingAverage = Math.round(ratingAverage * 10.0) / 10.0;
+        }
+        
+        return ProductResponse.builder()
+                .id(product.getId())
+                .name(product.getName())
+                .description(product.getDescription())
+                .shortDescription(product.getShortDescription())
+                .listPrice(product.getPrice())
+                .originalPrice(product.getOriginalPrice())
+                .quantitySold(quantitySold.intValue())
+                .ratingAverage(ratingAverage != null ? ratingAverage.floatValue() : 0.0f)
+                .publisherVn(product.getPublisherVn())
+                .publicationDate(product.getPublicationDate())
+                .dimensions(product.getDimensions())
+                .bookCover(product.getBookCover())
+                .numberOfPage(product.getNumberOfPage())
+                .stockQuantity(product.getStockQuantity())
+                .isActive(product.getIsActive())
+                .authors(product.getAuthors().stream()
+                        .map(a -> new AuthorResponse(a.getId(), a.getName(), a.getSlug()))
+                        .collect(Collectors.toList()))
+                .categoriesId(
+                        product.getCategory() != null
+                                ? product.getCategory().getId()
+                                : null
+                )
+                .images(product.getImages().stream()
+                        .map(i -> new ProductImageResponse(
+                                i.getId(),
+                                i.getBaseUrl(),
+                                i.getLabel(),
+                                i.getLargeUrl(),
+                                i.getMediumUrl(),
+                                i.getSmallUrl(),
+                                i.getThumbnailUrl(),
+                                i.getAltText()
+                        ))
+                        .collect(Collectors.toList()))
+                .build();
     }
 
 

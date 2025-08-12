@@ -56,4 +56,40 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     @Query("SELECT AVG(r.rating) FROM Review r WHERE r.product.id = :productId")
     Double getRatingAverage(@Param("productId") Long productId);
+
+    // Find all products ordered by quantity sold (descending)
+    @Query("SELECT p, COALESCE(SUM(oi.quantity), 0) as soldCount " +
+           "FROM Product p " +
+           "LEFT JOIN OrderItem oi ON p.id = oi.product.id " +
+           "WHERE p.isActive = true " +
+           "GROUP BY p.id " +
+           "ORDER BY soldCount DESC")
+    List<Object[]> findAllProductsOrderByQuantitySoldDesc();
+
+    // Find all products ordered by quantity sold (ascending)
+    @Query("SELECT p, COALESCE(SUM(oi.quantity), 0) as soldCount " +
+           "FROM Product p " +
+           "LEFT JOIN OrderItem oi ON p.id = oi.product.id " +
+           "WHERE p.isActive = true " +
+           "GROUP BY p.id " +
+           "ORDER BY soldCount ASC")
+    List<Object[]> findAllProductsOrderByQuantitySoldAsc();
+
+    // Find all products ordered by rating (descending)
+    @Query("SELECT p, AVG(r.rating) as avgRating " +
+           "FROM Product p " +
+           "LEFT JOIN Review r ON p.id = r.product.id " +
+           "WHERE p.isActive = true " +
+           "GROUP BY p.id " +
+           "ORDER BY avgRating DESC NULLS LAST")
+    List<Object[]> findAllProductsOrderByRatingDesc();
+
+    // Find all products ordered by rating (ascending)
+    @Query("SELECT p, AVG(r.rating) as avgRating " +
+           "FROM Product p " +
+           "LEFT JOIN Review r ON p.id = r.product.id " +
+           "WHERE p.isActive = true " +
+           "GROUP BY p.id " +
+           "ORDER BY avgRating ASC NULLS LAST")
+    List<Object[]> findAllProductsOrderByRatingAsc();
 }
