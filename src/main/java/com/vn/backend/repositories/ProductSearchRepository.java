@@ -13,25 +13,23 @@ public interface ProductSearchRepository extends JpaRepository<Product, Long> {
     
     @Query(value = """
         SELECT p.id, p.name, p.price, p.thumbnail_url,
-               COALESCE(AVG(r.rating), 0) as avg_rating,
-               COALESCE(SUM(oi.quantity), 0) as total_sold
+               COALESCE((SELECT AVG(r.rating) FROM reviews r WHERE r.product_id = p.id), 0) as avg_rating,
+               COALESCE((SELECT SUM(oi.quantity) FROM order_items oi WHERE oi.product_id = p.id), 0) as total_sold,
+               GROUP_CONCAT(a.name SEPARATOR ', ') as author_names,p.original_price
         FROM products p
-        LEFT JOIN reviews r ON p.id = r.product_id
-        LEFT JOIN order_items oi ON p.id = oi.product_id
+        LEFT JOIN authors a ON a.product_id = p.id
         WHERE p.is_active = true
         AND (:categoryId IS NULL OR p.category_id = :categoryId)
+        AND COALESCE((SELECT AVG(r.rating) FROM reviews r WHERE r.product_id = p.id), 0) >= COALESCE(:minRating, 0)
         GROUP BY p.id, p.name, p.price, p.thumbnail_url
-        HAVING COALESCE(AVG(r.rating), 0) >= COALESCE(:minRating, 0)
         ORDER BY p.price ASC
         """, 
         countQuery = """
-        SELECT COUNT(DISTINCT p.id)
+        SELECT COUNT(p.id)
         FROM products p
-        LEFT JOIN reviews r ON p.id = r.product_id
         WHERE p.is_active = true
         AND (:categoryId IS NULL OR p.category_id = :categoryId)
-        GROUP BY p.id
-        HAVING COALESCE(AVG(r.rating), 0) >= COALESCE(:minRating, 0)
+        AND COALESCE((SELECT AVG(r.rating) FROM reviews r WHERE r.product_id = p.id), 0) >= COALESCE(:minRating, 0)
         """,
         nativeQuery = true)
     Page<Object[]> findProductsWithRatingAndSold(
@@ -42,25 +40,23 @@ public interface ProductSearchRepository extends JpaRepository<Product, Long> {
     
     @Query(value = """
         SELECT p.id, p.name, p.price, p.thumbnail_url,
-               COALESCE(AVG(r.rating), 0) as avg_rating,
-               COALESCE(SUM(oi.quantity), 0) as total_sold
+               COALESCE((SELECT AVG(r.rating) FROM reviews r WHERE r.product_id = p.id), 0) as avg_rating,
+               COALESCE((SELECT SUM(oi.quantity) FROM order_items oi WHERE oi.product_id = p.id), 0) as total_sold,
+               GROUP_CONCAT(a.name SEPARATOR ', ') as author_names,p.original_price
         FROM products p
-        LEFT JOIN reviews r ON p.id = r.product_id
-        LEFT JOIN order_items oi ON p.id = oi.product_id
+        LEFT JOIN authors a ON a.product_id = p.id
         WHERE p.is_active = true
         AND (:categoryId IS NULL OR p.category_id = :categoryId)
+        AND COALESCE((SELECT AVG(r.rating) FROM reviews r WHERE r.product_id = p.id), 0) >= COALESCE(:minRating, 0)
         GROUP BY p.id, p.name, p.price, p.thumbnail_url
-        HAVING COALESCE(AVG(r.rating), 0) >= COALESCE(:minRating, 0)
         ORDER BY p.price DESC
         """, 
         countQuery = """
-        SELECT COUNT(DISTINCT p.id)
+        SELECT COUNT(p.id)
         FROM products p
-        LEFT JOIN reviews r ON p.id = r.product_id
         WHERE p.is_active = true
         AND (:categoryId IS NULL OR p.category_id = :categoryId)
-        GROUP BY p.id
-        HAVING COALESCE(AVG(r.rating), 0) >= COALESCE(:minRating, 0)
+        AND COALESCE((SELECT AVG(r.rating) FROM reviews r WHERE r.product_id = p.id), 0) >= COALESCE(:minRating, 0)
         """,
         nativeQuery = true)
     Page<Object[]> findProductsByPopularity(
@@ -71,25 +67,23 @@ public interface ProductSearchRepository extends JpaRepository<Product, Long> {
 
     @Query(value = """
         SELECT p.id, p.name, p.price, p.thumbnail_url,
-               COALESCE(AVG(r.rating), 0) as avg_rating,
-               COALESCE(SUM(oi.quantity), 0) as total_sold
+               COALESCE((SELECT AVG(r.rating) FROM reviews r WHERE r.product_id = p.id), 0) as avg_rating,
+               COALESCE((SELECT SUM(oi.quantity) FROM order_items oi WHERE oi.product_id = p.id), 0) as total_sold,
+               GROUP_CONCAT(a.name SEPARATOR ', ') as author_names,p.original_price
         FROM products p
-        LEFT JOIN reviews r ON p.id = r.product_id
-        LEFT JOIN order_items oi ON p.id = oi.product_id
+        LEFT JOIN authors a ON a.product_id = p.id
         WHERE p.is_active = true
         AND (:categoryId IS NULL OR p.category_id = :categoryId)
+        AND COALESCE((SELECT AVG(r.rating) FROM reviews r WHERE r.product_id = p.id), 0) >= COALESCE(:minRating, 0)
         GROUP BY p.id, p.name, p.price, p.thumbnail_url
-        HAVING COALESCE(AVG(r.rating), 0) >= COALESCE(:minRating, 0)
-        ORDER BY COALESCE(SUM(oi.quantity), 0) DESC
+        ORDER BY COALESCE((SELECT SUM(oi.quantity) FROM order_items oi WHERE oi.product_id = p.id), 0) DESC
         """, 
         countQuery = """
-        SELECT COUNT(DISTINCT p.id)
+        SELECT COUNT(p.id)
         FROM products p
-        LEFT JOIN reviews r ON p.id = r.product_id
         WHERE p.is_active = true
         AND (:categoryId IS NULL OR p.category_id = :categoryId)
-        GROUP BY p.id
-        HAVING COALESCE(AVG(r.rating), 0) >= COALESCE(:minRating, 0)
+        AND COALESCE((SELECT AVG(r.rating) FROM reviews r WHERE r.product_id = p.id), 0) >= COALESCE(:minRating, 0)
         """,
         nativeQuery = true)
     Page<Object[]> findProductsByPopularityOnly(

@@ -15,7 +15,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/categories")
-@CrossOrigin(origins = "*")
 public class CategoryController {
 
     private static final Logger logger = LoggerFactory.getLogger(CategoryController.class);
@@ -28,7 +27,7 @@ public class CategoryController {
      * Get root categories with their subcategories for sidebar display
      * @return List of categories with hierarchical structure
      */
-    @GetMapping
+    @GetMapping("/sub")
     public ResponseData<List<CategoryResponse>> getCategoriesWithSubcategories() {
         logger.info("[IN] GET /api/categories");
         List<CategoryResponse> categories = categoryService.getCategoriesWithSubcategories();
