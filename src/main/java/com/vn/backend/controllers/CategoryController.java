@@ -55,6 +55,18 @@ public class CategoryController {
         return response;
     }
 
+    // Search categories với keyword, page, size, sort
+    @GetMapping("/search")
+    public ResponseData<List<CategoryResponse1>> searchCategories(
+            @RequestParam(required = false) String keyword,
+            Pageable pageable) {
+        logger.info("[IN] GET /api/categories/search - Keyword: {}, Page: {}, Size: {}", 
+                   keyword, pageable.getPageNumber(), pageable.getPageSize());
+        var response = ResponseData.success(categoryService.searchCategories(keyword, pageable));
+        logger.info("[OUT] GET /api/categories/search");
+        return response;
+    }
+
     @GetMapping("/{id}")
     public ResponseData<CategoryResponse1> getCategoryById(@PathVariable Long id) {
         var response = ResponseData.success(categoryService.getCategoryById(id));

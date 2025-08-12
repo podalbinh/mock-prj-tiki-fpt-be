@@ -89,6 +89,23 @@ public class CategoryService {
                 .toList();
     }
 
+    // Method mới: Tìm kiếm categories với keyword và pagination
+    public List<CategoryResponse1> searchCategories(String keyword, Pageable pageable) {
+        Page<Category> categories;
+        
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            // Tìm kiếm theo keyword
+            categories = categoryRepository.findByNameContaining(keyword.trim(), pageable);
+        } else {
+            // Nếu không có keyword, lấy tất cả
+            categories = categoryRepository.findAll(pageable);
+        }
+        
+        return categories.getContent().stream()
+                .map(this::convertToCategoryResponse)
+                .toList();
+    }
+
     public CategoryResponse1 getCategoryById(Long id) {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy category với id: " + id));
