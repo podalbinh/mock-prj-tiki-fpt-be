@@ -39,40 +39,49 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Page<Product> findByCategoryIdAndIsActiveTrue(@Param("categoryId") Long categoryId, Pageable pageable);
 
     // Find products by category ID with ratings and sold count for homepage
-    @Query("SELECT p, AVG(r.rating) as avgRating, COUNT(r.id) as reviewCount, " +
-           "COALESCE(SUM(oi.quantity), 0) as soldCount " +
+    @Query("SELECT p, " +
+           "(SELECT AVG(r2.rating) FROM Review r2 WHERE r2.product.id = p.id) as avgRating, " +
+           "(SELECT COUNT(r3.id) FROM Review r3 WHERE r3.product.id = p.id) as reviewCount, " +
+           "(SELECT COALESCE(SUM(oi2.quantity), 0) FROM OrderItem oi2 " +
+           " JOIN Order o2 ON oi2.order.id = o2.id " +
+           " WHERE oi2.product.id = p.id AND o2.status != 3) as soldCount " +
            "FROM Product p " +
-           "LEFT JOIN Review r ON p.id = r.product.id " +
-           "LEFT JOIN OrderItem oi ON p.id = oi.product.id " +
            "WHERE p.category.id = :categoryId AND p.isActive = true " +
-           "GROUP BY p.id " +
            "ORDER BY p.id DESC")
     Page<Object[]> findProductsByCategoryWithRatingsAndSoldCount(@Param("categoryId") Long categoryId, Pageable pageable);
 
     List<Product> findByIsActiveTrue(Sort sort);
 
-    @Query("SELECT SUM(oi.quantity) FROM OrderItem oi WHERE oi.product.id = :productId")
+    @Query("SELECT COALESCE(SUM(oi.quantity), 0) FROM OrderItem oi " +
+           "JOIN Order o ON oi.order.id = o.id " +
+           "WHERE oi.product.id = :productId AND o.status != 3")
     Long getSoldQuantity(@Param("productId") Long productId);
 
     @Query("SELECT AVG(r.rating) FROM Review r WHERE r.product.id = :productId")
     Double getRatingAverage(@Param("productId") Long productId);
 
     // Find all products ordered by quantity sold (descending)
-    @Query("SELECT p, COALESCE(SUM(oi.quantity), 0) as soldCount " +
+    @Query("SELECT p, " +
+           "(SELECT COALESCE(SUM(oi2.quantity), 0) FROM OrderItem oi2 " +
+           " JOIN Order o2 ON oi2.order.id = o2.id " +
+           " WHERE oi2.product.id = p.id AND o2.status != 3) as soldCount " +
            "FROM Product p " +
-           "LEFT JOIN OrderItem oi ON p.id = oi.product.id " +
            "WHERE p.isActive = true " +
-           "GROUP BY p.id " +
-           "ORDER BY soldCount DESC")
+           "ORDER BY (SELECT COALESCE(SUM(oi3.quantity), 0) FROM OrderItem oi3 " +
+           "         JOIN Order o3 ON oi3.order.id = o3.id " +
+           "         WHERE oi3.product.id = p.id AND o3.status != 3) DESC")
     List<Object[]> findAllProductsOrderByQuantitySoldDesc();
 
     // Find all products ordered by quantity sold (ascending)
-    @Query("SELECT p, COALESCE(SUM(oi.quantity), 0) as soldCount " +
+    @Query("SELECT p, " +
+           "(SELECT COALESCE(SUM(oi2.quantity), 0) FROM OrderItem oi2 " +
+           " JOIN Order o2 ON oi2.order.id = o2.id " +
+           " WHERE oi2.product.id = p.id AND o2.status != 3) as soldCount " +
            "FROM Product p " +
-           "LEFT JOIN OrderItem oi ON p.id = oi.product.id " +
            "WHERE p.isActive = true " +
-           "GROUP BY p.id " +
-           "ORDER BY soldCount ASC")
+           "ORDER BY (SELECT COALESCE(SUM(oi3.quantity), 0) FROM OrderItem oi3 " +
+           "         JOIN Order o3 ON oi3.order.id = o3.id " +
+           "         WHERE oi3.product.id = p.id AND o3.status != 3) ASC")
     List<Object[]> findAllProductsOrderByQuantitySoldAsc();
 
     // Find all products ordered by rating (descending)
