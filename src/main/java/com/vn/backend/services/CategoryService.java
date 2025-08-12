@@ -89,6 +89,23 @@ public class CategoryService {
                 .toList();
     }
 
+    // Method mới: Tìm kiếm categories với keyword và pagination
+    public List<CategoryResponse1> searchCategories(String keyword, Pageable pageable) {
+        Page<Category> categories;
+        
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            // Tìm kiếm theo keyword
+            categories = categoryRepository.findByNameContaining(keyword.trim(), pageable);
+        } else {
+            // Nếu không có keyword, lấy tất cả
+            categories = categoryRepository.findAll(pageable);
+        }
+        
+        return categories.getContent().stream()
+                .map(this::convertToCategoryResponse)
+                .toList();
+    }
+
     public CategoryResponse1 getCategoryById(Long id) {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy category với id: " + id));
@@ -96,9 +113,18 @@ public class CategoryService {
     }
 
     public CategoryResponse1 createCategory(CategoryRequest categoryRequest) {
-        Category category = Category.builder()
+        Category.CategoryBuilder categoryBuilder = Category.builder()
                 .name(categoryRequest.getName())
-                .build();
+                .thumbnailUrl(categoryRequest.getThumbnailUrl());
+
+        // Thiết lập parent nếu có parentId
+        if (categoryRequest.getParentId() != null) {
+            Category parent = categoryRepository.findById(categoryRequest.getParentId())
+                    .orElseThrow(() -> new NotFoundException("Không tìm thấy parent category với id: " + categoryRequest.getParentId()));
+            categoryBuilder.parent(parent);
+        }
+
+        Category category = categoryBuilder.build();
         Category savedCategory = categoryRepository.save(category);
         return convertToCategoryResponse(savedCategory);
     }
@@ -106,9 +132,24 @@ public class CategoryService {
     public CategoryResponse1 updateCategory(Long id, CategoryRequest categoryRequest) {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy category với id: " + id));
+        
+        // Cập nhật name nếu có
         if(categoryRequest.getName() != null) {
             category.setName(categoryRequest.getName());
         }
+        
+        // Cập nhật thumbnailUrl nếu có
+        if(categoryRequest.getThumbnailUrl() != null) {
+            category.setThumbnailUrl(categoryRequest.getThumbnailUrl());
+        }
+        
+        // Cập nhật parent nếu có parentId
+        if(categoryRequest.getParentId() != null) {
+            Category parent = categoryRepository.findById(categoryRequest.getParentId())
+                    .orElseThrow(() -> new NotFoundException("Không tìm thấy parent category với id: " + categoryRequest.getParentId()));
+            category.setParent(parent);
+        }
+        
         Category updatedCategory = categoryRepository.save(category);
         return convertToCategoryResponse(updatedCategory);
     }
@@ -120,9 +161,25 @@ public class CategoryService {
     }
 
     private CategoryResponse1 convertToCategoryResponse(Category category) {
-        return CategoryResponse1.builder()
+        CategoryResponse1.CategoryResponse1Builder builder = CategoryResponse1.builder()
                 .id(category.getId())
                 .name(category.getName())
-                .build();
+                .thumbnailUrl(category.getThumbnailUrl());
+
+        // Gán thông tin parent nếu có
+        if (category.getParent() != null) {
+            Category parent = category.getParent();
+            builder.parentId(parent.getId())
+                   .parentName(parent.getName())
+                   .parent(CategoryResponse1.builder()
+                           .id(parent.getId())
+                           .name(parent.getName())
+                           .thumbnailUrl(parent.getThumbnailUrl())
+                           .parentId(parent.getParent() != null ? parent.getParent().getId() : null)
+                           .parentName(parent.getParent() != null ? parent.getParent().getName() : null)
+                           .build());
+        }
+
+        return builder.build();
     }
 }

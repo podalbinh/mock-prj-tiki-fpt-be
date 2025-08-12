@@ -11,4 +11,10 @@ import lombok.experimental.FieldDefaults;
 public class CategoryResponse1 {
     Long id;
     String name;
+    String thumbnailUrl;
+    
+    // Thông tin parent category
+    Long parentId;
+    String parentName;
+    CategoryResponse1 parent; // Đối tượng parent đầy đủ
 }

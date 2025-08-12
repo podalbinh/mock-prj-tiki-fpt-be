@@ -1,6 +1,5 @@
 package com.vn.backend.controllers;
 
-import com.vn.backend.configs.jwt.JwtTokenPovider;
 import com.vn.backend.dto.request.LoginRequest;
 import com.vn.backend.dto.request.SignUpRequest;
 import com.vn.backend.dto.response.JwtResponse;
@@ -11,8 +10,6 @@ import com.vn.backend.services.AuthService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,13 +24,7 @@ public class AuthController {
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
     @Autowired
-    private AuthenticationManager authenticationManager;
-    @Autowired
-    private JwtTokenPovider tokenPovider;
-    @Autowired
     private AuthService authService;
-    @Autowired
-    private PasswordEncoder encoder;
 
     @PostMapping("/register")
     public ResponseData<MessageResponse> registerUser(@RequestBody SignUpRequest signUpRequest) {
