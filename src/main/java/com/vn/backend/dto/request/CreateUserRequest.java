@@ -16,4 +16,5 @@ public class CreateUserRequest {
     private Role role;
     private Boolean isActive;
     private String avatarUrl;
+    private String address;
 }
