@@ -101,4 +101,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
            "GROUP BY p.id " +
            "ORDER BY avgRating ASC NULLS LAST")
     List<Object[]> findAllProductsOrderByRatingAsc();
+
+
+    @Query("SELECT CASE WHEN COUNT(p) > 0 THEN true ELSE false END FROM Product p WHERE p.id = :productId AND p.stockQuantity >= :quantity")
+    Boolean validateCart(@Param("productId") Long productId, @Param("quantity") Integer quantity);
 }

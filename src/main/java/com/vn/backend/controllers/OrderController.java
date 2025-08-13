@@ -24,4 +24,10 @@ public class OrderController {
         List<OrderResponseDTO> orders = orderService.getAllOrders();
         return ResponseData.success(orders);
     }
+
+    @PostMapping("/api/orders/create")
+    public ResponseData<OrderResponseDTO> createOrder(HttpServletRequest request) {
+        OrderResponseDTO order = orderService.createOrder(request);
+        return ResponseData.success(order);
+    }
 }
