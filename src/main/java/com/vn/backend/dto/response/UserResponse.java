@@ -17,6 +17,7 @@ public class UserResponse {
     private String email;
     private String fullName;
     private String phone;
+    private String address;
     private Boolean isActive;
     private Role role;
     private String avatarUrl;
