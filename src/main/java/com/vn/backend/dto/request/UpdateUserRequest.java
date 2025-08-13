@@ -14,4 +14,5 @@ public class UpdateUserRequest {
     private Role role;
     private String avatarUrl;
     private Boolean isActive;
+    private String address;
 }

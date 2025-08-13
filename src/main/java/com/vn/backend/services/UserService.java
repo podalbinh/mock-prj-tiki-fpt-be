@@ -63,6 +63,7 @@ public class UserService {
                 .password(encoder.encode(request.getPassword()))
                 .fullName(request.getFullName())
                 .phone(request.getPhone())
+                .address(request.getAddress())
                 .role(request.getRole() != null ? request.getRole() : com.vn.backend.utils.enums.Role.USER)
                 .isActive(request.getIsActive() != null ? request.getIsActive() : true)
                 .avatarUrl(request.getAvatarUrl())
@@ -87,6 +88,9 @@ public class UserService {
         }
         if (request.getPhone() != null) {
             user.setPhone(request.getPhone());
+        }
+        if (request.getAddress() != null) {
+            user.setAddress(request.getAddress());
         }
         if (request.getRole() != null) {
             user.setRole(request.getRole());
@@ -123,6 +127,7 @@ public class UserService {
                 .email(user.getEmail())
                 .fullName(user.getFullName())
                 .phone(user.getPhone())
+                .address(user.getAddress())
                 .isActive(user.getIsActive())
                 .role(user.getRole())
                 .avatarUrl(user.getAvatarUrl())

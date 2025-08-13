@@ -77,6 +77,7 @@ public class AuthService implements UserDetailsService{
                 .email(currentUser.getEmail())
                 .fullName(currentUser.getFullName())
                 .phone(currentUser.getPhone())
+                .address(currentUser.getAddress())
                 .isActive(currentUser.getIsActive())
                 .role(currentUser.getRole())
                 .avatarUrl(currentUser.getAvatarUrl())
