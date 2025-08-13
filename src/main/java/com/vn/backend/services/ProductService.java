@@ -1,9 +1,7 @@
 package com.vn.backend.services;
 
-import com.vn.backend.controllers.UserController;
 import com.vn.backend.dto.request.CreateProductRequest;
 import com.vn.backend.dto.response.AuthorResponse;
-import com.vn.backend.dto.response.CategoryResponse;
 import com.vn.backend.dto.response.ProductImageResponse;
 import com.vn.backend.dto.response.ProductResponse;
 import com.vn.backend.entities.Author;
@@ -321,7 +319,7 @@ public class ProductService {
         }
         Double ratingAverage = productRepository.getRatingAverage(product.getId());
         if (ratingAverage != null) {
-        ratingAverage = Math.round(ratingAverage * 10.0) / 10.0;
+            ratingAverage = Math.round(ratingAverage * 10.0) / 10.0;
         }
         return ProductResponse.builder()
                 .id(product.getId())
@@ -331,7 +329,7 @@ public class ProductService {
                 .listPrice(product.getPrice())
                 .originalPrice(product.getOriginalPrice())
                 .quantitySold(quantitySold.intValue())
-                .ratingAverage(ratingAverage.floatValue())
+                .ratingAverage(ratingAverage != null ? ratingAverage.floatValue() : 0.0f)
                 .publisherVn(product.getPublisherVn())
                 .publicationDate(product.getPublicationDate())
                 .dimensions(product.getDimensions())
