@@ -4,7 +4,10 @@ import com.vn.backend.dto.response.OrderResponseDTO;
 import com.vn.backend.dto.response.ItemResponseDTO;
 
 import com.vn.backend.entities.Order;
+import com.vn.backend.exceptions.NotFoundException;
 import com.vn.backend.repositories.OrderRepository;
+
+import jakarta.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -40,6 +43,44 @@ public class OrderService {
                 statusStr
             );
         }).collect(Collectors.toList());
+    }
+
+    @Transactional
+    public OrderResponseDTO updateOrderStatus(Long orderId, String statusStr) {
+        Order order = orderRepository.findById(orderId)
+            .orElseThrow(() -> new NotFoundException("Không tìm thấy đơn hàng với ID: " + orderId));
+
+        Integer status = mapStatusStringToInteger(statusStr);
+        order.setStatus(status);
+
+        Order updatedOrder = orderRepository.save(order);
+
+        // Map lại thành DTO trả về
+        List<ItemResponseDTO> items = updatedOrder.getOrderItems().stream()
+            .map(oi -> new ItemResponseDTO(
+                oi.getId(),
+                oi.getQuantity(),
+                oi.getProduct().getName(),
+                oi.getUnitPrice()
+            )).collect(Collectors.toList());
+
+        return new OrderResponseDTO(
+            updatedOrder.getId(),
+            updatedOrder.getUser().getFullName(),
+            items,
+            updatedOrder.getTotalAmount(),
+            statusStr
+        );
+    }
+
+    private Integer mapStatusStringToInteger(String statusStr) {
+        switch (statusStr.toLowerCase()) {
+            case "pending": return 0;
+            case "confirmed": return 1;
+            case "cancelled": return 2;
+            case "completed": return 3;
+            default: throw new IllegalArgumentException("Trạng thái không hợp lệ: " + statusStr);
+        }
     }
 
     private String mapStatus(Integer status) {
