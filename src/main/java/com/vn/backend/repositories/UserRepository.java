@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Repository
@@ -21,4 +22,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
            "u.fullName LIKE %:keyword% OR " +
            "u.phone LIKE %:keyword%")
     Page<User> findByKeyword(@Param("keyword") String keyword, Pageable pageable);
+    
+    // Dashboard queries
+    @Query("SELECT COUNT(u) FROM User u WHERE u.createdAt >= :startDate AND u.createdAt <= :endDate")
+    Long countUsersByDateRange(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
 }
