@@ -54,6 +54,12 @@ public class Product {
     @Column(name="book_cover", length = 255)
     private String bookCover;
 
+    @Column(name="dich_gia", length = 255)
+    private String dichGia;
+
+    @Column(name="manufacturer", length = 255)
+    private String manufacturer;
+
     @Column(name="number_of_page", length = 255)
     private String numberOfPage;
 

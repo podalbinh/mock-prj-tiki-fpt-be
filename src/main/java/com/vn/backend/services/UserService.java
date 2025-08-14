@@ -11,7 +11,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -28,13 +30,36 @@ public class UserService {
     @Autowired
     private PasswordEncoder encoder;
 
-    // 1. Lấy danh sách users với phân trang
-    public List<UserResponse> getAllUsers(Pageable pageable) {
-        logger.info("[IN] Get all users - Page: {}, Size: {}", pageable.getPageNumber(), pageable.getPageSize());
-        Page<User> users = userRepository.findAll(pageable);
+    // 1. Lấy danh sách users với phân trang và tìm kiếm
+    public List<UserResponse> getAllUsers(String keyword, Pageable pageable) {
+        logger.info("[IN] Get all users - Keyword: {}, Page: {}, Size: {}", 
+                   keyword, pageable.getPageNumber(), pageable.getPageSize());
+        
+        // Tạo sort mặc định nếu không có sort parameter
+        Pageable pageableWithDefaultSort = pageable;
+        if (pageable.getSort().isUnsorted()) {
+            Sort defaultSort = Sort.by(Sort.Direction.DESC, "createdAt");
+            pageableWithDefaultSort = PageRequest.of(
+                pageable.getPageNumber(), 
+                pageable.getPageSize(), 
+                defaultSort
+            );
+        }
+        
+        Page<User> users;
+        
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            // Tìm kiếm theo keyword trong email, fullName, phone
+            users = userRepository.findByKeyword(keyword.trim(), pageableWithDefaultSort);
+        } else {
+            // Nếu không có keyword, lấy tất cả
+            users = userRepository.findAll(pageableWithDefaultSort);
+        }
+        
         List<UserResponse> userResponses = users.getContent().stream()
                 .map(this::convertToUserResponse)
                 .collect(Collectors.toList());
+        
         logger.info("[OUT] Get all users - Total: {}", userResponses.size());
         return userResponses;
     }
