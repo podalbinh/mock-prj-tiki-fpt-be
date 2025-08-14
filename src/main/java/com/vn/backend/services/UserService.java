@@ -2,6 +2,7 @@ package com.vn.backend.services;
 
 import com.vn.backend.dto.request.CreateUserRequest;
 import com.vn.backend.dto.request.UpdateUserRequest;
+import com.vn.backend.dto.response.PagedResponse;
 import com.vn.backend.dto.response.UserResponse;
 import com.vn.backend.entities.User;
 import com.vn.backend.exceptions.InvalidDataException;
@@ -31,7 +32,7 @@ public class UserService {
     private PasswordEncoder encoder;
 
     // 1. Lấy danh sách users với phân trang và tìm kiếm
-    public List<UserResponse> getAllUsers(String keyword, Pageable pageable) {
+    public PagedResponse<UserResponse> getAllUsers(String keyword, Pageable pageable) {
         logger.info("[IN] Get all users - Keyword: {}, Page: {}, Size: {}", 
                    keyword, pageable.getPageNumber(), pageable.getPageSize());
         
@@ -59,9 +60,20 @@ public class UserService {
         List<UserResponse> userResponses = users.getContent().stream()
                 .map(this::convertToUserResponse)
                 .collect(Collectors.toList());
+
+        PagedResponse<UserResponse> response = PagedResponse.<UserResponse> builder()
+                .data(userResponses)
+                .totalElements(users.getTotalElements())
+                .totalPages(users.getTotalPages())
+                .currentPage(users.getNumber())
+                .pageSize(users.getSize())
+                .hasNext(users.hasNext())
+                .hasPrevious(users.hasPrevious())
+                .build();
         
-        logger.info("[OUT] Get all users - Total: {}", userResponses.size());
-        return userResponses;
+        logger.info("[OUT] Get all users - Total: {}, Page: {}/{}", 
+                   users.getTotalElements(), users.getNumber() + 1, users.getTotalPages());
+        return response;
     }
 
     // 2. Lấy user theo ID
