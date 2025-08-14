@@ -29,8 +29,12 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
     @Query("SELECT c FROM Category c WHERE c.parent IS NULL AND c.thumbnailUrl IS NOT NULL AND c.thumbnailUrl != ''")
     List<Category> findRootCategoriesWithThumbnail();
 
-    // Tìm kiếm categories theo tên (có phân trang)
+        // Tìm kiếm categories theo tên (có phân trang)
     @Query("SELECT c FROM Category c WHERE c.name LIKE %:keyword%")
     Page<Category> findByNameContaining(@Param("keyword") String keyword, Pageable pageable);
+
+    // Dashboard queries - Get category distribution
+    @Query("SELECT c.name, COUNT(p) FROM Category c LEFT JOIN Product p ON c.id = p.category.id WHERE p.isActive = true GROUP BY c.id, c.name")
+    List<Object[]> getCategoryProductCount();
 
 }
