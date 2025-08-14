@@ -23,10 +23,12 @@ public class ProductResponse {
     private String publicationDate;
     private String dimensions;
     private String bookCover;
+    private String dichGia;
+    private String manufacturer;
     private String numberOfPage;
     private Integer stockQuantity;
     private Boolean isActive;
-    private String thumbnail;
+    private String thumbnailUrl;
 
     private List<AuthorResponse> authors;
     private Long categoriesId;

@@ -20,8 +20,10 @@ public class CreateProductRequest {
     private String publicationDate;
     private String dimensions;
     private String bookCover;
+    private String dichGia;
+    private String manufacturer;
     private String numberOfPage;
-    private String thumbnail;
+    private String thumbnailUrl;
 
     private List<CreateAuthorRequest> authors;
     private Long categoriesId;

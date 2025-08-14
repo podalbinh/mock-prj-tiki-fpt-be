@@ -21,11 +21,14 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    // 1. GET /api/users - Lấy danh sách users với phân trang
+    // 1. GET /api/users - Lấy danh sách users với phân trang và tìm kiếm
     @GetMapping
-    public ResponseData<List<UserResponse>> getAllUsers(Pageable pageable) {
-        logger.info("[IN] GET /api/users - Page: {}, Size: {}", pageable.getPageNumber(), pageable.getPageSize());
-        var response = ResponseData.success(userService.getAllUsers(pageable));
+    public ResponseData<List<UserResponse>> getAllUsers(
+            @RequestParam(required = false) String keyword,
+            Pageable pageable) {
+        logger.info("[IN] GET /api/users - Keyword: {}, Page: {}, Size: {}", 
+                   keyword, pageable.getPageNumber(), pageable.getPageSize());
+        var response = ResponseData.success(userService.getAllUsers(keyword, pageable));
         logger.info("[OUT] GET /api/users");
         return response;
     }

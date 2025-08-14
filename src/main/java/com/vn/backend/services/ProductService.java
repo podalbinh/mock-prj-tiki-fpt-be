@@ -1,9 +1,7 @@
 package com.vn.backend.services;
 
-import com.vn.backend.controllers.UserController;
 import com.vn.backend.dto.request.CreateProductRequest;
 import com.vn.backend.dto.response.AuthorResponse;
-import com.vn.backend.dto.response.CategoryResponse;
 import com.vn.backend.dto.response.ProductImageResponse;
 import com.vn.backend.dto.response.ProductResponse;
 import com.vn.backend.entities.Author;
@@ -53,10 +51,11 @@ public class ProductService {
                 .dimensions(request.getDimensions())
                 .bookCover(request.getBookCover())
                 .numberOfPage(request.getNumberOfPage())
-                // .quantitySold(0)
+                .manufacturer(request.getManufacturer())
+                .dichGia(request.getDichGia())
                 .stockQuantity(0)
                 .isActive(true)
-                .thumbnailUrl(request.getThumbnail())
+                .thumbnailUrl(request.getThumbnailUrl())
                 .build();
 
         Category category = categoryRepository.findById(request.getCategoriesId()).get();
@@ -189,8 +188,11 @@ public class ProductService {
                 .publicationDate(product.getPublicationDate())
                 .dimensions(product.getDimensions())
                 .bookCover(product.getBookCover())
+                .manufacturer(product.getManufacturer())
+                .dichGia(product.getDichGia())
                 .numberOfPage(product.getNumberOfPage())
                 .stockQuantity(product.getStockQuantity())
+                .thumbnailUrl(product.getThumbnailUrl())
                 .isActive(product.getIsActive())
                 .authors(product.getAuthors().stream()
                         .map(a -> new AuthorResponse(a.getId(), a.getName(), a.getSlug()))
@@ -238,8 +240,11 @@ public class ProductService {
                 .publicationDate(product.getPublicationDate())
                 .dimensions(product.getDimensions())
                 .bookCover(product.getBookCover())
+                .dichGia(product.getDichGia())
+                .manufacturer(product.getManufacturer())
                 .numberOfPage(product.getNumberOfPage())
                 .stockQuantity(product.getStockQuantity())
+                .thumbnailUrl(product.getThumbnailUrl())
                 .isActive(product.getIsActive())
                 .authors(product.getAuthors().stream()
                         .map(a -> new AuthorResponse(a.getId(), a.getName(), a.getSlug()))
@@ -299,6 +304,13 @@ public class ProductService {
         product.setShortDescription(request.getShortDescription());
         product.setPrice(request.getListPrice());
         product.setOriginalPrice(request.getOriginalPrice());
+        product.setPublisherVn(request.getPublisherVn());
+        product.setDimensions(request.getDimensions());
+        product.setBookCover(request.getBookCover());
+        product.setDichGia(request.getDichGia());
+        product.setPublicationDate(request.getPublicationDate());
+        product.setDichGia(request.getDichGia());
+        product.setManufacturer(request.getManufacturer());
         product.getImages().addAll(images);
 
         Product updated = productRepository.save(product);
@@ -321,7 +333,7 @@ public class ProductService {
         }
         Double ratingAverage = productRepository.getRatingAverage(product.getId());
         if (ratingAverage != null) {
-        ratingAverage = Math.round(ratingAverage * 10.0) / 10.0;
+            ratingAverage = Math.round(ratingAverage * 10.0) / 10.0;
         }
         return ProductResponse.builder()
                 .id(product.getId())
@@ -331,13 +343,16 @@ public class ProductService {
                 .listPrice(product.getPrice())
                 .originalPrice(product.getOriginalPrice())
                 .quantitySold(quantitySold.intValue())
-                .ratingAverage(ratingAverage.floatValue())
+                .ratingAverage(ratingAverage != null ? ratingAverage.floatValue() : 0.0f)
                 .publisherVn(product.getPublisherVn())
                 .publicationDate(product.getPublicationDate())
                 .dimensions(product.getDimensions())
                 .bookCover(product.getBookCover())
+                .dichGia(product.getDichGia())
+                .manufacturer(product.getManufacturer())
                 .numberOfPage(product.getNumberOfPage())
                 .stockQuantity(product.getStockQuantity())
+                .thumbnailUrl(product.getThumbnailUrl())
                 .isActive(product.getIsActive())
 
                 .authors(product.getAuthors().stream()
