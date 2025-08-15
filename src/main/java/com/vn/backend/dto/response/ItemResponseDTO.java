@@ -7,12 +7,14 @@ public class ItemResponseDTO {
     private Integer quantity;
     private String name;
     private BigDecimal price;
+    private String thumbnail;
 
-    public ItemResponseDTO(Long id, Integer quantity, String name, BigDecimal price) {
+    public ItemResponseDTO(Long id, Integer quantity, String name, BigDecimal price, String thumbnail) {
         this.id = id;
         this.quantity = quantity;
         this.name = name;
         this.price = price;
+        this.thumbnail = thumbnail;
     }
 
     // getters và setters
@@ -27,4 +29,7 @@ public class ItemResponseDTO {
 
     public BigDecimal getPrice() { return price; }
     public void setPrice(BigDecimal price) { this.price = price; }
+
+    public String getThumbnail() { return thumbnail; }
+    public void setThumbnail(String thumbnail) { this.thumbnail = thumbnail; }
 }

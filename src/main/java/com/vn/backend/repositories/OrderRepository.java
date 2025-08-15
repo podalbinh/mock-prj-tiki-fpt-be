@@ -1,6 +1,9 @@
 package com.vn.backend.repositories;
 
 import com.vn.backend.entities.Order;
+
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -26,4 +29,5 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     // Get recent orders for dashboard
     @Query("SELECT o FROM Order o ORDER BY o.createdAt DESC")
     List<Order> findRecentOrders();
+    List<Order> findByUserId(Long userId);
 }

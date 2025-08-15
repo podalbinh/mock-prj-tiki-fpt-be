@@ -33,8 +33,13 @@ public class UserService {
 
     // 1. Lấy danh sách users với phân trang và tìm kiếm
     public PagedResponse<UserResponse> getAllUsers(String keyword, Pageable pageable) {
-        logger.info("[IN] Get all users - Keyword: {}, Page: {}, Size: {}", 
-                   keyword, pageable.getPageNumber(), pageable.getPageSize());
+        return getAllUsers(keyword, pageable, false); // Mặc định hiển thị tất cả users
+    }
+    
+    // 1a. Lấy danh sách users với tùy chọn chỉ hiển thị user active
+    public PagedResponse<UserResponse> getAllUsers(String keyword, Pageable pageable, boolean activeOnly) {
+        logger.info("[IN] Get all users - Keyword: {}, Page: {}, Size: {}, ActiveOnly: {}", 
+                   keyword, pageable.getPageNumber(), pageable.getPageSize(), activeOnly);
         
         // Tạo sort mặc định nếu không có sort parameter
         Pageable pageableWithDefaultSort = pageable;
@@ -49,19 +54,27 @@ public class UserService {
         
         Page<User> users;
         
-        if (keyword != null && !keyword.trim().isEmpty()) {
-            // Tìm kiếm theo keyword trong email, fullName, phone
-            users = userRepository.findByKeyword(keyword.trim(), pageableWithDefaultSort);
+        if (activeOnly) {
+            // Chỉ lấy user active
+            if (keyword != null && !keyword.trim().isEmpty()) {
+                users = userRepository.findActiveUsersByKeyword(keyword.trim(), pageableWithDefaultSort);
+            } else {
+                users = userRepository.findAllActiveUsers(pageableWithDefaultSort);
+            }
         } else {
-            // Nếu không có keyword, lấy tất cả
-            users = userRepository.findAll(pageableWithDefaultSort);
+            // Lấy tất cả users (bao gồm cả inactive)
+            if (keyword != null && !keyword.trim().isEmpty()) {
+                users = userRepository.findByKeyword(keyword.trim(), pageableWithDefaultSort);
+            } else {
+                users = userRepository.findAll(pageableWithDefaultSort);
+            }
         }
         
         List<UserResponse> userResponses = users.getContent().stream()
                 .map(this::convertToUserResponse)
                 .collect(Collectors.toList());
-
-        PagedResponse<UserResponse> response = PagedResponse.<UserResponse> builder()
+        
+        PagedResponse<UserResponse> response = PagedResponse.<UserResponse>builder()
                 .data(userResponses)
                 .totalElements(users.getTotalElements())
                 .totalPages(users.getTotalPages())
@@ -71,12 +84,10 @@ public class UserService {
                 .hasPrevious(users.hasPrevious())
                 .build();
         
-        logger.info("[OUT] Get all users - Total: {}, Page: {}/{}", 
-                   users.getTotalElements(), users.getNumber() + 1, users.getTotalPages());
+        logger.info("[OUT] Get all users - Total: {}, Page: {}/{}, ActiveOnly: {}", 
+                   users.getTotalElements(), users.getNumber() + 1, users.getTotalPages(), activeOnly);
         return response;
-    }
-
-    // 2. Lấy user theo ID
+    }    // 2. Lấy user theo ID
     public UserResponse getUserById(Long id) {
         logger.info("[IN] Get user by ID: {}", id);
         User user = userRepository.findById(id)
@@ -146,15 +157,25 @@ public class UserService {
         return response;
     }
 
-    // 5. Xóa user
+    // 5. Xóa user (soft delete để tránh foreign key constraint)
     public void deleteUser(Long id) {
         logger.info("[IN] Delete user with ID: {}", id);
         
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy user với ID: " + id));
         
-        userRepository.delete(user);
-        logger.info("[OUT] Delete user with ID: {}", id);
+        try {
+            // Thử xóa trực tiếp trước
+            userRepository.delete(user);
+            logger.info("[OUT] Delete user with ID: {} - Hard delete successful", id);
+        } catch (Exception e) {
+            // Nếu có foreign key constraint, thực hiện soft delete
+            logger.warn("[WARN] Cannot hard delete user with ID: {} due to foreign key constraints. Performing soft delete.", id);
+            user.setIsActive(false);
+            user.setEmail("deleted_" + user.getId() + "_" + user.getEmail()); // Để tránh conflict email khi tạo user mới
+            userRepository.save(user);
+            logger.info("[OUT] Delete user with ID: {} - Soft delete successful", id);
+        }
     }
 
     // Helper method để convert User entity thành UserResponse

@@ -3,6 +3,7 @@ package com.vn.backend.services;
 import com.vn.backend.dto.request.CreateOrderRequest;
 import com.vn.backend.dto.response.CreateOrderResponse;
 import com.vn.backend.dto.response.OrderResponseDTO;
+import com.vn.backend.dto.response.UserOrderResponseDTO;
 import com.vn.backend.dto.response.ItemResponseDTO;
 
 import com.vn.backend.entities.Order;
@@ -17,8 +18,10 @@ import com.vn.backend.repositories.ProductRepository;
 import com.vn.backend.utils.enums.OrderStatusType;
 import jakarta.transaction.Transactional;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -45,7 +48,8 @@ public class OrderService {
                     oi.getId(),
                     oi.getQuantity(),
                     oi.getProduct().getName(),
-                    oi.getUnitPrice()
+                    oi.getUnitPrice(),
+                    oi.getProduct().getThumbnailUrl() 
                 )).collect(Collectors.toList());
 
             String statusStr = mapStatus(order.getStatus());
@@ -76,7 +80,8 @@ public class OrderService {
                 oi.getId(),
                 oi.getQuantity(),
                 oi.getProduct().getName(),
-                oi.getUnitPrice()
+                oi.getUnitPrice(),
+                oi.getProduct().getThumbnailUrl() 
             )).collect(Collectors.toList());
 
         return new OrderResponseDTO(
@@ -139,4 +144,61 @@ public class OrderService {
         return new CreateOrderResponse(orderId, order.getTotalAmount(), orderItems.stream().map(orderItem -> new CreateOrderResponse.ProductOrderResponse(orderItem.getProduct().getId(), orderItem.getProduct().getName(), orderItem.getProduct().getThumbnailUrl())).collect(Collectors.toList()));
 
     }
+
+    public List<UserOrderResponseDTO> getOrdersByUser(Long userId) {
+    List<Order> orders = orderRepository.findByUserId(userId);
+
+    return orders.stream().map(order -> {
+        List<ItemResponseDTO> items = order.getOrderItems().stream()
+            .map(oi -> new ItemResponseDTO(
+                oi.getId(),
+                oi.getQuantity(),
+                oi.getProduct().getName(),
+                oi.getUnitPrice(),
+                oi.getProduct().getThumbnailUrl() 
+            ))
+            .toList();
+
+        return new UserOrderResponseDTO(
+            order.getId(),
+            order.getUser().getFullName(),
+            order.getAddress(),
+            order.getTotalAmount(),
+            mapStatus(order.getStatus()),
+            order.getCreatedAt(),
+            order.getUpdatedAt(),
+            items
+        );
+            }).toList();
+    }
+
+    public UserOrderResponseDTO getOrderDetailById(Long orderId, Long userId) {
+        Order order = orderRepository.findById(orderId)
+            .orElseThrow(() -> new NotFoundException("Không tìm thấy đơn hàng"));
+
+        if (!order.getUser().getId().equals(userId)) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Bạn chưa đăng nhập");
+        }
+
+        List<ItemResponseDTO> items = order.getOrderItems().stream()
+            .map(oi -> new ItemResponseDTO(
+                oi.getId(),
+                oi.getQuantity(),
+                oi.getProduct().getName(),
+                oi.getUnitPrice(),
+                oi.getProduct().getThumbnailUrl() 
+            )).toList();
+
+        return new UserOrderResponseDTO(
+            order.getId(),
+            order.getUser().getFullName(),
+            order.getAddress(),
+            order.getTotalAmount(),
+            mapStatus(order.getStatus()),
+            order.getCreatedAt(),
+            order.getUpdatedAt(),
+            items
+        );
+    }
+
 }

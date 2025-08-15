@@ -24,10 +24,11 @@ public class UserController {
     @GetMapping
     public ResponseData<PagedResponse<UserResponse>> getAllUsers(
             @RequestParam(required = false) String keyword,
+            @RequestParam(required = false, defaultValue = "false") boolean activeOnly,
             Pageable pageable) {
-        logger.info("[IN] GET /api/users - Keyword: {}, Page: {}, Size: {}", 
-                   keyword, pageable.getPageNumber(), pageable.getPageSize());
-        var response = ResponseData.success(userService.getAllUsers(keyword, pageable));
+        logger.info("[IN] GET /api/users - Keyword: {}, ActiveOnly: {}, Page: {}, Size: {}", 
+                   keyword, activeOnly, pageable.getPageNumber(), pageable.getPageSize());
+        var response = ResponseData.success(userService.getAllUsers(keyword, pageable, activeOnly));
         logger.info("[OUT] GET /api/users");
         return response;
     }
