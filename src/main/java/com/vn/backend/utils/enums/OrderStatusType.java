@@ -1,11 +1,10 @@
 package com.vn.backend.utils.enums;
 
 public enum OrderStatusType {
-    PENDING(0,"Chờ xử lý"),        // Chờ xử lý
-    CONFIRMED(1,"Đã xác nhận"),      // Đã xác nhận
-    SHIPPING(2,"Đang giao hàng"),       // Đang giao hàng
-    DELIVERED(3,"Đã giao hàng"),      // Đã giao hàng
-    CANCELLED(4,"Đã hủy");      // Đã hủy
+    CONFIRMED(0,"Đã xác nhận"),      // Đã xác nhận
+    SHIPPING(1,"Đang giao hàng"),       // Đang giao hàng
+    DELIVERED(2,"Đã giao hàng"),      // Đã giao hàng
+    CANCELLED(3,"Đã hủy");      // Đã hủy
 
     private final int value;
     private final String description;

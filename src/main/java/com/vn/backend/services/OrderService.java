@@ -95,8 +95,8 @@ public class OrderService {
 
     private Integer mapStatusStringToInteger(String statusStr) {
         switch (statusStr.toLowerCase()) {
-            case "pending": return 0;
-            case "confirmed": return 1;
+            case "confirmed": return 0;
+            case "delivered": return 1;
             case "cancelled": return 2;
             case "completed": return 3;
             default: throw new IllegalArgumentException("Trạng thái không hợp lệ: " + statusStr);
@@ -105,8 +105,8 @@ public class OrderService {
 
     private String mapStatus(Integer status) {
         switch (status) {
-            case 0: return "pending";
-            case 1: return "confirmed";
+            case 0: return "confirmed";
+            case 1: return "delivered";
             case 2: return "cancelled";
             default: return "completed";
         }
@@ -133,7 +133,7 @@ public class OrderService {
         }
         order.setOrderItems(orderItems);
         order.setTotalAmount(orderItems.stream().map(OrderItem::getUnitPrice).reduce(BigDecimal.ZERO, BigDecimal::add));
-        order.setStatus(OrderStatusType.PENDING.getValue());
+        order.setStatus(OrderStatusType.CONFIRMED.getValue());
         Long orderId=orderRepository.save(order).getId();
         // Cập nhật Stock Quantity
         for(OrderItem orderItem : orderItems){
