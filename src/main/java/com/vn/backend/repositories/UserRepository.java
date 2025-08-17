@@ -23,6 +23,17 @@ public interface UserRepository extends JpaRepository<User, Long> {
            "u.phone LIKE %:keyword%")
     Page<User> findByKeyword(@Param("keyword") String keyword, Pageable pageable);
     
+    // Tìm kiếm users active theo keyword
+    @Query("SELECT u FROM User u WHERE u.isActive = true AND (" +
+           "u.email LIKE %:keyword% OR " +
+           "u.fullName LIKE %:keyword% OR " +
+           "u.phone LIKE %:keyword%)")
+    Page<User> findActiveUsersByKeyword(@Param("keyword") String keyword, Pageable pageable);
+    
+    // Lấy tất cả users active
+    @Query("SELECT u FROM User u WHERE u.isActive = true")
+    Page<User> findAllActiveUsers(Pageable pageable);
+    
     // Dashboard queries
     @Query("SELECT COUNT(u) FROM User u WHERE u.createdAt >= :startDate AND u.createdAt <= :endDate")
     Long countUsersByDateRange(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);

@@ -2,6 +2,7 @@ package com.vn.backend.controllers;
 
 import com.vn.backend.dto.request.CreateUserRequest;
 import com.vn.backend.dto.request.UpdateUserRequest;
+import com.vn.backend.dto.response.PagedResponse;
 import com.vn.backend.dto.response.ResponseData;
 import com.vn.backend.dto.response.UserResponse;
 import com.vn.backend.services.UserService;
@@ -10,8 +11,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
@@ -23,12 +22,13 @@ public class UserController {
 
     // 1. GET /api/users - Lấy danh sách users với phân trang và tìm kiếm
     @GetMapping
-    public ResponseData<List<UserResponse>> getAllUsers(
+    public ResponseData<PagedResponse<UserResponse>> getAllUsers(
             @RequestParam(required = false) String keyword,
+            @RequestParam(required = false, defaultValue = "false") boolean activeOnly,
             Pageable pageable) {
-        logger.info("[IN] GET /api/users - Keyword: {}, Page: {}, Size: {}", 
-                   keyword, pageable.getPageNumber(), pageable.getPageSize());
-        var response = ResponseData.success(userService.getAllUsers(keyword, pageable));
+        logger.info("[IN] GET /api/users - Keyword: {}, ActiveOnly: {}, Page: {}, Size: {}", 
+                   keyword, activeOnly, pageable.getPageNumber(), pageable.getPageSize());
+        var response = ResponseData.success(userService.getAllUsers(keyword, pageable, activeOnly));
         logger.info("[OUT] GET /api/users");
         return response;
     }
