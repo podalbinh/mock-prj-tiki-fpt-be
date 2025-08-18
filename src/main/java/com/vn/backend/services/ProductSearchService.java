@@ -42,6 +42,9 @@ public class ProductSearchService {
                 productPage = productSearchRepository.findProductsByPopularityOnly(
                         request.getMinRating(), request.getCategoryId(), pageable);
         }
+        if(request.getKeyword() != null && !request.getKeyword().equals("")){
+            productPage = productSearchRepository.searchProductsByKeyword(request.getKeyword(), pageable);
+        }
 
         List<ProductHPResponse> products = productPage.getContent().stream()
                 .map(this::mapToProductHPResponse)

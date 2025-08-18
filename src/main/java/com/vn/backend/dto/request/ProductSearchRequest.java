@@ -9,4 +9,5 @@ public class ProductSearchRequest {
     private String sortBy = "popular"; // popular, price_asc, price_desc
     private Double minRating; // Lọc theo rating chỉ khi được gửi lên
     private Long categoryId; // Lọc theo category ID nếu được gửi lên
+    private String keyword;
 }

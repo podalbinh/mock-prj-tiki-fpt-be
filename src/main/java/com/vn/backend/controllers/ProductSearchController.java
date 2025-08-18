@@ -78,6 +78,12 @@ public class ProductSearchController {
                 type = "integer", 
                 minimum = "1"
             )
+        ),
+        @Parameter(
+            name = "keyword",
+            description = "Enter keyword to search by name, short description, description",
+            example = "truyện",
+            schema = @io.swagger.v3.oas.annotations.media.Schema(type = "string")
         )
     })
     @ApiResponses({
@@ -103,7 +109,8 @@ public class ProductSearchController {
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "popular") String sortBy,
             @RequestParam(defaultValue = "4.0") double minRating,
-            @RequestParam(required = false) Long categoryId) {
+            @RequestParam(required = false) Long categoryId,
+            @RequestParam(defaultValue = "") String keyword) {
   
         
         logger.info("[IN] Search products - Page: {}, Size: {}, SortBy: {}, MinRating: {}, CategoryId: {}", 
@@ -127,11 +134,12 @@ public class ProductSearchController {
         request.setSortBy(sortBy);
         request.setMinRating(minRating);
         request.setCategoryId(categoryId);
+        request.setKeyword(keyword);
         
         PageResponse<List<ProductHPResponse>> response = productSearchService.searchProducts(request);
         logger.info("[OUT] Search products - Page: {}, Size: {}, SortBy: {}, MinRating: {}, CategoryId: {}", 
         page, size, sortBy, minRating, categoryId);
         return ResponseData.success(response);
     }
-    
+
 }
